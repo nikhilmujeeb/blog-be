@@ -1,20 +1,19 @@
 import express from 'express';
 import multer from 'multer';
-import Image from '../models/Image.js'; // Your image model
+import Image from '../model/Image.js';
 
 const router = express.Router();
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'uploads/'); // Change to your upload directory
+        cb(null, 'uploads/'); 
     },
     filename: (req, file, cb) => {
-        cb(null, Date.now() + '-' + file.originalname); // Unique file name
+        cb(null, Date.now() + '-' + file.originalname);
     }
 });
 
 const upload = multer({ storage });
 
-// Upload route
 router.post('/upload', upload.single('file'), async (req, res) => {
     try {
         const newImage = new Image({
