@@ -3,9 +3,9 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import multer from 'multer';
-import bcrypt from 'bcrypt'; // Make sure to import bcrypt
-import jwt from 'jsonwebtoken'; // Make sure to import jsonwebtoken
-import User from './models/User.js'; // Import your User model
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import User from './models/User.js';
 import Connection from './database/db.js';
 import Router from './routes/route.js';
 
@@ -13,11 +13,10 @@ dotenv.config();
 
 const app = express();
 
-// CORS configuration
 app.use(cors({
-    origin: 'https://blog-fe-dcjv.onrender.com', // Replace with your actual frontend URL
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed methods
-    credentials: true, // If you need to send cookies
+    origin: 'https://blog-fe-dcjv.onrender.com',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], 
+    credentials: true, 
 }));
 
 app.use(bodyParser.json({ extended: true }));
@@ -34,7 +33,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// Upload endpoint
 app.post('/upload', upload.single('file'), async (req, res) => {
     try {
         const newImage = {
@@ -53,9 +51,8 @@ app.get("/", (req, res) => {
     res.send("Welcome to the API!");
 });
 
-// Login endpoint
 app.post('/login', async (req, res) => {
-    console.log('Received body:', req.body); // Log the incoming request body
+    console.log('Received body:', req.body); 
     try {
         const { email, password } = req.body;
         if (!email || !password) {
