@@ -2,7 +2,10 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import multer from 'multer'; 
+import multer from 'multer';
+import bcrypt from 'bcrypt'; // Make sure to import bcrypt
+import jwt from 'jsonwebtoken'; // Make sure to import jsonwebtoken
+import User from './models/User.js'; // Import your User model
 import Connection from './database/db.js';
 import Router from './routes/route.js';
 
@@ -10,30 +13,34 @@ dotenv.config();
 
 const app = express();
 
+// CORS configuration
 app.use(cors({
-    origin: 'https://your-frontend-url.com',
-  }));
+    origin: 'https://blog-fe-dcjv.onrender.com', // Replace with your actual frontend URL
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed methods
+    credentials: true, // If you need to send cookies
+}));
+
 app.use(bodyParser.json({ extended: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'uploads/'); 
+        cb(null, 'uploads/');
     },
     filename: (req, file, cb) => {
-        cb(null, file.originalname); 
+        cb(null, file.originalname);
     },
 });
 
 const upload = multer({ storage });
 
+// Upload endpoint
 app.post('/upload', upload.single('file'), async (req, res) => {
     try {
         const newImage = {
             name: req.file.originalname,
             path: req.file.path,
         };
-
         res.status(200).json({ isSuccess: true, data: newImage });
     } catch (error) {
         res.status(500).json({ isSuccess: false, message: error.message });
@@ -46,31 +53,33 @@ app.get("/", (req, res) => {
     res.send("Welcome to the API!");
 });
 
+// Login endpoint
 app.post('/login', async (req, res) => {
+    console.log('Received body:', req.body); // Log the incoming request body
     try {
-      const { email, password } = req.body;
-      if (!email || !password) {
-        return res.status(400).json({ msg: 'Email and password are required' });
-      }
-  
-      const user = await User.findOne({ email });
-      if (!user) {
-        return res.status(404).json({ msg: 'User not found' });
-      }
-  
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        return res.status(401).json({ msg: 'Invalid credentials' });
-      }
-  
-      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
-      res.json({ token, user: { id: user._id, email: user.email } });
+        const { email, password } = req.body;
+        if (!email || !password) {
+            return res.status(400).json({ msg: 'Email and password are required' });
+        }
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ msg: 'User not found' });
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(401).json({ msg: 'Invalid credentials' });
+        }
+
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+        res.json({ token, user: { id: user._id, email: user.email } });
     } catch (err) {
-      console.error('Login Error:', err);
-      res.status(500).json({ msg: 'Error while logging in the user' });
+        console.error('Login Error:', err);
+        res.status(500).json({ msg: 'Error while logging in the user' });
     }
-  });
-  
+});
+
 const PORT = 8000;
 const username = process.env.DB_USERNAME;
 const password = process.env.DB_PASSWORD;
