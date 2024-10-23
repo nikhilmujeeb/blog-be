@@ -10,7 +10,9 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+    origin: 'https://your-frontend-url.com',
+  }));
 app.use(bodyParser.json({ extended: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -44,6 +46,31 @@ app.get("/", (req, res) => {
     res.send("Welcome to the API!");
 });
 
+app.post('/login', async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      if (!email || !password) {
+        return res.status(400).json({ msg: 'Email and password are required' });
+      }
+  
+      const user = await User.findOne({ email });
+      if (!user) {
+        return res.status(404).json({ msg: 'User not found' });
+      }
+  
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        return res.status(401).json({ msg: 'Invalid credentials' });
+      }
+  
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+      res.json({ token, user: { id: user._id, email: user.email } });
+    } catch (err) {
+      console.error('Login Error:', err);
+      res.status(500).json({ msg: 'Error while logging in the user' });
+    }
+  });
+  
 const PORT = 8000;
 const username = process.env.DB_USERNAME;
 const password = process.env.DB_PASSWORD;
