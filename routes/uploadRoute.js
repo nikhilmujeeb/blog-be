@@ -1,35 +1,30 @@
 import express from 'express';
 import multer from 'multer';
-import Image from '../model/Image.js'; // Ensure this import is correct
+import Image from '../models/Image.js'; // Your image model
 
 const router = express.Router();
-
-// Set up multer for file uploads
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'uploads/'); // Set the destination folder for uploads
+        cb(null, 'uploads/'); // Change to your upload directory
     },
     filename: (req, file, cb) => {
-        cb(null, file.originalname); // Set the file name as original
-    },
+        cb(null, Date.now() + '-' + file.originalname); // Unique file name
+    }
 });
 
 const upload = multer({ storage });
 
-// Route for file uploads
-router.post('/', upload.single('file'), async (req, res) => {
+// Upload route
+router.post('/upload', upload.single('file'), async (req, res) => {
     try {
-        const newImage = {
+        const newImage = new Image({
             name: req.file.originalname,
             path: req.file.path,
-        };
-
-        // Save the image information to the database
-        const savedImage = await Image.create(newImage);
-
-        res.status(200).json({ isSuccess: true, data: savedImage });
+        });
+        await newImage.save();
+        res.status(200).json({ message: 'Image uploaded successfully', data: newImage });
     } catch (error) {
-        res.status(500).json({ isSuccess: false, message: error.message });
+        res.status(500).json({ message: 'Error uploading image', error });
     }
 });
 
