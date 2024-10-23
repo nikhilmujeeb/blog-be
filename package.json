@@ -7,7 +7,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "pm2 start index.js --name my-app",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "postinstall": "npm rebuild bcrypt --build-from-source"
   },
   "author": "",
   "license": "ISC",
