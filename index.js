@@ -5,7 +5,7 @@ import bodyParser from 'body-parser';
 import multer from 'multer';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import User from './models/User.js';
+import User from './model/user.js';
 import Connection from './database/db.js';
 import Router from './routes/route.js';
 
