@@ -21,30 +21,25 @@ export const signupUser = async (request, response) => {
   }
 }
 
-export const loginUser = async (request, response) => {
-  let user = await User.findOne({ username: request.body.username });
-  if (!user) {
-    return response.status(400).json({ msg: 'Username does not match' });
-  }
-
+export const loginUser = async (req, res) => {
   try {
-    let match = await bcryptjs.compare(request.body.password, user.password);
-    if (match) {
-      const accessToken = jwt.sign(user.toJSON(), process.env.ACCESS_SECRET_KEY, { expiresIn: '15m' });
-      const refreshToken = jwt.sign(user.toJSON(), process.env.REFRESH_SECRET_KEY);
+      const { email, password } = req.body;
+      const user = await User.findOne({ email });
 
-      const newToken = new Token({ token: refreshToken });
-      await newToken.save();
+      if (!user) return res.status(404).json({ message: 'User not found' });
 
-      response.status(200).json({ accessToken: accessToken, refreshToken: refreshToken, name: user.name, username: user.username });
-    } else {
-      response.status(400).json({ msg: 'Password does not match' });
-    }
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) return res.status(401).json({ message: 'Invalid credentials' });
+
+      const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+      res.status(200).json({ message: 'Login successful', token });
   } catch (error) {
-    console.error('Error in loginUser:', error); // Log the error for debugging
-    response.status(500).json({ msg: 'Error while logging in the user' });
+      console.error('Login error:', error); 
+      res.status(500).json({ message: 'Internal Server Error' });
   }
-}
+};
+
 
 export const logoutUser = async (request, response) => {
   const token = request.body.token;

@@ -1,8 +1,12 @@
 import express from 'express';
 import multer from 'multer';
 import Image from '../model/Image.js';
+import upload from '../utils/upload.js';
 
 const router = express.Router();
+
+router.post('/file/upload', upload.single('file'), uploadImage);
+
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, 'uploads/'); 

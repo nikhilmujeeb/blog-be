@@ -21,6 +21,7 @@ app.use(cors({
 
 app.use(bodyParser.json({ extended: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use('/api', Router); 
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -51,7 +52,7 @@ app.get("/", (req, res) => {
     res.send("Welcome to the API!");
 });
 
-app.post('/user', async (req, res) => {
+app.post('/login', async (req, res) => {
     try {
       const { email, password } = req.body;
       const user = await User.findOne({ email });
