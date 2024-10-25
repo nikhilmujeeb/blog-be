@@ -13,12 +13,13 @@ const app = express();
 app.use(express.json());
 
 app.use(
-  cors({
-    origin: 'https://blog-be-3tvt.onrender.com',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true,
-  })
-);
+    cors({
+      origin: 'https://blog-fe-dcjv.onrender.com',
+      methods: ['GET', 'POST', 'PUT', 'DELETE'],
+      credentials: true, 
+    })
+  );
+  
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
