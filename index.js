@@ -43,6 +43,43 @@ app.post('/upload', upload.single('file'), (req, res) => {
 app.use('/api', Router);
 app.get('/', (req, res) => res.send('Welcome to the API!'));
 
+// Login route
+app.post('/api/login', async (req, res) => {
+    const { username, password } = req.body;
+
+    try {
+        // Find user by username
+        const user = await User.findOne({ username });
+        
+        if (!user) {
+            return res.status(401).json({ isSuccess: false, msg: 'User not found' });
+        }
+
+        // Compare passwords (assuming you're using bcrypt for hashing)
+        const isMatch = await user.comparePassword(password); // Implement comparePassword in your User model
+        
+        if (!isMatch) {
+            return res.status(401).json({ isSuccess: false, msg: 'Invalid password' });
+        }
+
+        // Generate JWT token
+        const accessToken = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+        // Respond with success
+        res.status(200).json({
+            isSuccess: true,
+            data: {
+                accessToken,
+                name: user.name,
+                username: user.username,
+            },
+        });
+    } catch (error) {
+        console.error('Login error:', error);
+        res.status(500).json({ isSuccess: false, msg: 'Internal server error' });
+    }
+});
+
 const PORT = process.env.PORT || 8000;
 const DB_URL = process.env.DB;
 
