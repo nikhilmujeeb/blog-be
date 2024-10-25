@@ -14,7 +14,7 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: 'https://blog-fe-dcjv.onrender.com',
+    origin: 'https://blog-be-3tvt.onrender.com',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
   })

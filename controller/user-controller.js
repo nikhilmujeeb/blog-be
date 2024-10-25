@@ -11,7 +11,7 @@ dotenv.config();
 export const signupUser = async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
-    const user = { name: req.body.name, password: hashedPassword };
+    const user = { username: req.body.username, password: hashedPassword };
 
     const newUser = new User(user);
     await newUser.save();
@@ -26,8 +26,8 @@ export const signupUser = async (req, res) => {
 // Login User
 export const loginUser = async (req, res) => {
   try {
-    const { name, password } = req.body;
-    const user = await User.findOne({ name });
+    const { username, password } = req.body;
+    const user = await User.findOne({ username });
 
     if (!user) return res.status(404).json({ message: 'User not found' });
 
