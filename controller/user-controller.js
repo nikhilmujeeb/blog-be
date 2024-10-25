@@ -1,3 +1,4 @@
+// controller/user-controller.js
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
@@ -15,7 +16,7 @@ export const signupUser = async (req, res) => {
     const newUser = new User(user);
     await newUser.save();
 
-    return res.status(200).json({ msg: 'Signup successful' });
+    return res.status(201).json({ msg: 'Signup successful' });
   } catch (error) {
     console.error('Error in signupUser:', error);
     return res.status(500).json({ msg: 'Error while signing up user' });
@@ -47,7 +48,11 @@ export const loginUser = async (req, res) => {
 
     await new Token({ token: refreshToken }).save();
 
-    res.status(200).json({ message: 'Login successful', accessToken, refreshToken });
+    res.status(200).json({ 
+      message: 'Login successful', 
+      accessToken, 
+      refreshToken 
+    });
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ message: 'Internal Server Error' });
@@ -58,8 +63,11 @@ export const loginUser = async (req, res) => {
 export const logoutUser = async (req, res) => {
   try {
     const { token } = req.body;
-    const result = await Token.deleteOne({ token });
 
+    const decoded = jwt.verify(token, process.env.REFRESH_SECRET_KEY);
+    if (!decoded) return res.status(401).json({ msg: 'Invalid token' });
+
+    const result = await Token.deleteOne({ token });
     if (!result.deletedCount) return res.status(400).json({ msg: 'Invalid token' });
 
     res.status(204).json({ msg: 'Logout successful' });
