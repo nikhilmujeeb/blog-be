@@ -2,28 +2,25 @@ import Post from '../model/post.js';
 
 export const createPost = async (request, response) => {
     try {
-        const post = new Post(request.body); // Create a new post instance
-        await post.save(); // Wait for the save to complete
+        const post = new Post(request.body);
+        await post.save();
 
         response.status(200).json('Post saved successfully');
     } catch (error) {
-        response.status(500).json(error);
+        response.status(500).json({ msg: 'Error saving post', error });
     }
 }
 
 export const updatePost = async (request, response) => {
     try {
         const post = await Post.findById(request.params.id);
-
-        if (!post) {
-            return response.status(404).json({ msg: 'Post not found' }); // Use return to stop execution
-        }
+        if (!post) return response.status(404).json({ msg: 'Post not found' });
 
         await Post.findByIdAndUpdate(request.params.id, { $set: request.body });
 
         response.status(200).json('Post updated successfully');
     } catch (error) {
-        response.status(500).json(error);
+        response.status(500).json({ msg: 'Error updating post', error });
     }
 }
 

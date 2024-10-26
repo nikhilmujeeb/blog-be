@@ -6,11 +6,14 @@ import bodyParser from 'body-parser';
 import multer from 'multer';
 import Router from './routes/route.js';
 import Connection from './database/db.js';
+import { check, validationResult } from 'express-validator'; // Import express-validator
+import morgan from 'morgan'; // Import morgan for logging
 
 dotenv.config();
 
 const app = express();
 app.use(express.json());
+app.use(morgan('dev')); // Set up logging middleware
 
 app.use(
     cors({
@@ -18,8 +21,7 @@ app.use(
       methods: ['GET', 'POST', 'PUT', 'DELETE'],
       credentials: true, 
     })
-  );
-  
+);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -45,7 +47,16 @@ app.use('/api', Router);
 
 app.get('/', (req, res) => res.send('Welcome to the API!'));
 
-app.post('/api/login', async (req, res) => {
+// Updated Login Route with Validation
+app.post('/api/login', [
+    check('username').notEmpty().withMessage('Username is required'),
+    check('password').notEmpty().withMessage('Password is required'),
+], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ isSuccess: false, errors: errors.array() });
+    }
+
     const { username, password } = req.body;
 
     try {

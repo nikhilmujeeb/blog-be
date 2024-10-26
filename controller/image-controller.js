@@ -3,7 +3,6 @@ import mongoose from 'mongoose';
 
 const url = 'mongodb+srv://nikhilmujeeb:bUckAIS7RWIGAy7R@blog-db.w2ayo.mongodb.net/';
 
-
 let gfs, gridfsBucket;
 const conn = mongoose.connection;
 conn.once('open', () => {
@@ -14,10 +13,9 @@ conn.once('open', () => {
     gfs.collection('fs');
 });
 
-
 export const uploadImage = (request, response) => {
-    if(!request.file) 
-        return response.status(404).json("File not found");
+    if (!request.file) 
+        return response.status(404).json({ msg: "File not found" });
     
     const imageUrl = `${url}/file/${request.file.filename}`;
 
@@ -25,13 +23,16 @@ export const uploadImage = (request, response) => {
 }
 
 export const getImage = async (request, response) => {
-    try {   
+    try {
         const file = await gfs.files.findOne({ filename: request.params.filename });
-        // const readStream = gfs.createReadStream(file.filename);
-        // readStream.pipe(response);
+        if (!file) return response.status(404).json({ msg: 'File not found' }); // Check if file exists
+
         const readStream = gridfsBucket.openDownloadStream(file._id);
+        readStream.on('error', () => {
+            response.status(500).json({ msg: 'Error reading file' });
+        });
         readStream.pipe(response);
     } catch (error) {
-        response.status(500).json({ msg: error.message });
+        response.status(500).json({ msg: 'Error retrieving image', error });
     }
 }

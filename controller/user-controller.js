@@ -27,7 +27,7 @@ export const signupUser = async (req, res) => {
     return res.status(201).json({ msg: 'Signup successful' });
   } catch (error) {
     console.error('Error in signupUser:', error);
-    return res.status(500).json({ msg: 'Error while signing up user' });
+    return res.status(500).json({ msg: 'Error while signing up user', error });
   }
 };
 
