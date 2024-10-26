@@ -1,49 +1,59 @@
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-
 import Token from '../model/token.js';
 
 dotenv.config();
 
-export const authenticateToken = (request, response, next) => {
-    const authHeader = request.headers['authorization'];
+export const authenticateToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
-    
-    if (token == null) {
-        return response.status(401).json({ msg: 'token is missing' });
+
+    if (!token) {
+        return res.status(401).json({ msg: 'Token is missing' });
     }
 
     jwt.verify(token, process.env.ACCESS_SECRET_KEY, (error, user) => {
         if (error) {
-            return response.status(403).json({ msg: 'invalid token' })
+            console.error('JWT Verification Error:', error); 
+            return res.status(403).json({ msg: 'Invalid token' });
         }
 
-        request.user = user;
+        req.user = user; 
         next();
-    })
-}
+    });
+};
 
-export const createNewToken = async (request, response) => {
-    const refreshToken = request.body.token.split(' ')[1];
+export const createNewToken = async (req, res) => {
+    const authHeader = req.body.token || ''; // Ensure token exists to avoid errors
+    const refreshToken = authHeader.split(' ')[1] || authHeader; // Handle both cases
 
     if (!refreshToken) {
-        return response.status(401).json({ msg: 'Refresh token is missing' })
+        return res.status(401).json({ msg: 'Refresh token is missing' });
     }
 
-    const token = await Token.findOne({ token: refreshToken });
+    try {
+        const tokenDoc = await Token.findOne({ token: refreshToken });
 
-    if (!token) {
-        return response.status(404).json({ msg: 'Refresh token is not valid'});
-    }
-
-    jwt.verify(token.token, process.env.REFRESH_SECRET_KEY, (error, user) => {
-        if (error) {
-            response.status(500).json({ msg: 'invalid refresh token'});
+        if (!tokenDoc) {
+            return res.status(404).json({ msg: 'Refresh token is not valid' });
         }
-        const accessToken = jwt.sign(user, process.env.ACCESS_SECRET_KEY, { expiresIn: '15m'});
 
-        return response.status(200).json({ accessToken: accessToken })
-    })
+        jwt.verify(tokenDoc.token, process.env.REFRESH_SECRET_KEY, (error, user) => {
+            if (error) {
+                console.error('Refresh Token Error:', error); // Log error
+                return res.status(403).json({ msg: 'Invalid refresh token' });
+            }
 
+            const newAccessToken = jwt.sign(
+                { userId: user.userId }, // Ensure the user ID is correctly passed
+                process.env.ACCESS_SECRET_KEY,
+                { expiresIn: '15m' }
+            );
 
-}
+            res.status(200).json({ accessToken: newAccessToken });
+        });
+    } catch (error) {
+        console.error('Database Error:', error); // Handle any DB errors
+        res.status(500).json({ msg: 'Internal Server Error' });
+    }
+};
