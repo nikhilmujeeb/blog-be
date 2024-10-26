@@ -1,4 +1,3 @@
-// controller/user-controller.js
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
@@ -10,10 +9,19 @@ dotenv.config();
 // Signup User
 export const signupUser = async (req, res) => {
   try {
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
-    const user = { username: req.body.username, password: hashedPassword };
+    const { username, password } = req.body;
 
-    const newUser = new User(user);
+    if (!username || !password) {
+      return res.status(400).json({ msg: 'Username and password are required' });
+    }
+
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
+      return res.status(409).json({ msg: 'Username already exists' });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = new User({ username, password: hashedPassword });
     await newUser.save();
 
     return res.status(201).json({ msg: 'Signup successful' });
@@ -27,12 +35,16 @@ export const signupUser = async (req, res) => {
 export const loginUser = async (req, res) => {
   try {
     const { username, password } = req.body;
-    const user = await User.findOne({ username });
 
-    if (!user) return res.status(404).json({ message: 'User not found' });
+    if (!username || !password) {
+      return res.status(400).json({ msg: 'Username and password are required' });
+    }
+
+    const user = await User.findOne({ username });
+    if (!user) return res.status(404).json({ msg: 'User not found' });
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) return res.status(401).json({ message: 'Invalid credentials' });
+    if (!isPasswordValid) return res.status(401).json({ msg: 'Invalid credentials' });
 
     const accessToken = jwt.sign(
       { userId: user._id },
@@ -48,14 +60,14 @@ export const loginUser = async (req, res) => {
 
     await new Token({ token: refreshToken }).save();
 
-    res.status(200).json({ 
-      message: 'Login successful', 
-      accessToken, 
-      refreshToken 
+    res.status(200).json({
+      message: 'Login successful',
+      accessToken,
+      refreshToken,
     });
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ message: 'Internal Server Error' });
+    res.status(500).json({ msg: 'Internal Server Error' });
   }
 };
 
@@ -63,6 +75,8 @@ export const loginUser = async (req, res) => {
 export const logoutUser = async (req, res) => {
   try {
     const { token } = req.body;
+
+    if (!token) return res.status(400).json({ msg: 'Token is required' });
 
     const decoded = jwt.verify(token, process.env.REFRESH_SECRET_KEY);
     if (!decoded) return res.status(401).json({ msg: 'Invalid token' });

@@ -42,6 +42,7 @@ app.post('/upload', upload.single('file'), (req, res) => {
 });
 
 app.use('/api', Router);
+
 app.get('/', (req, res) => res.send('Welcome to the API!'));
 
 app.post('/api/login', async (req, res) => {
