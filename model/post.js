@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 
+// Define the Post Schema
 const PostSchema = mongoose.Schema({
     title: {
         type: String,
@@ -19,15 +20,16 @@ const PostSchema = mongoose.Schema({
         required: true
     },
     categories: {
-        type: Array,
-        required: false   
+        type: [String], 
+        required: false,
+        default: [] 
     },
     createdDate: {
-        type: Date
+        type: Date,
+        default: Date.now 
     }
-});
+}, { timestamps: true }); 
 
+const Post = mongoose.model('Post', PostSchema);
 
-const post = mongoose.model('post', PostSchema);
-
-export default post;
+export default Post;

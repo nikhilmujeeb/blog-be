@@ -1,72 +1,74 @@
 import Post from '../model/post.js';
 
+// Create a new post
 export const createPost = async (request, response) => {
     try {
         const post = new Post(request.body);
         await post.save();
-
-        response.status(200).json('Post saved successfully');
+        response.status(201).json({ isSuccess: true, message: 'Post saved successfully', post });
     } catch (error) {
-        response.status(500).json({ msg: 'Error saving post', error });
+        console.error("Error saving post:", error);
+        response.status(500).json({ isSuccess: false, message: 'Error saving post' });
     }
 }
 
+// Update an existing post
 export const updatePost = async (request, response) => {
     try {
         const post = await Post.findById(request.params.id);
-        if (!post) return response.status(404).json({ msg: 'Post not found' });
+        if (!post) {
+            return response.status(404).json({ isSuccess: false, message: 'Post not found' });
+        }
 
-        await Post.findByIdAndUpdate(request.params.id, { $set: request.body });
-
-        response.status(200).json('Post updated successfully');
+        await Post.findByIdAndUpdate(request.params.id, { $set: request.body }, { new: true });
+        response.status(200).json({ isSuccess: true, message: 'Post updated successfully', post });
     } catch (error) {
-        response.status(500).json({ msg: 'Error updating post', error });
+        console.error("Error updating post:", error);
+        response.status(500).json({ isSuccess: false, message: 'Error updating post' });
     }
 }
 
-export const deletePost = async (req, res) => {
+// Delete a post
+export const deletePost = async (request, response) => {
     try {
-        const postId = req.params.id;
-        const result = await PostModel.findByIdAndDelete(postId);
+        const postId = request.params.id;
+        const result = await Post.findByIdAndDelete(postId);
         if (!result) {
-            return res.status(404).json({ isSuccess: false, message: "Post not found" }); // Handle not found case
+            return response.status(404).json({ isSuccess: false, message: "Post not found" });
         }
-        res.status(200).json({ isSuccess: true, message: "Post deleted successfully" });
+        response.status(200).json({ isSuccess: true, message: "Post deleted successfully" });
     } catch (error) {
         console.error("Error deleting post:", error);
-        res.status(500).json({ isSuccess: false, message: "Failed to delete post" });
+        response.status(500).json({ isSuccess: false, message: "Failed to delete post" });
     }
 };
 
+// Get a single post by ID
 export const getPost = async (request, response) => {
     try {
         const post = await Post.findById(request.params.id);
-
         if (!post) {
-            return response.status(404).json({ msg: 'Post not found' }); // Handle the case if the post doesn't exist
+            return response.status(404).json({ isSuccess: false, message: 'Post not found' });
         }
-
-        response.status(200).json(post);
+        response.status(200).json({ isSuccess: true, post });
     } catch (error) {
-        response.status(500).json(error);
+        console.error("Error fetching post:", error);
+        response.status(500).json({ isSuccess: false, message: 'Error fetching post' });
     }
 }
 
+// Get all posts or filter by username or category
 export const getAllPosts = async (request, response) => {
-    let username = request.query.username;
-    let category = request.query.category;
-    let posts;
+    const { username, category } = request.query;
     try {
-        if (username) {
-            posts = await Post.find({ username: username });
-        } else if (category) {
-            posts = await Post.find({ categories: category });
-        } else {
-            posts = await Post.find({});
-        }
-        
-        response.status(200).json(posts);
+        const query = {};
+        if (username) query.username = username;
+        if (category) query.categories = category;
+
+        const posts = await Post.find(query);
+        response.status(200).json({ isSuccess: true, posts });
     } catch (error) {
-        response.status(500).json(error);
+        console.error("Error fetching posts:", error);
+        response.status(500).json({ isSuccess: false, message: 'Error fetching posts' });
     }
 }
