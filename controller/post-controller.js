@@ -20,8 +20,9 @@ export const updatePost = async (req, res) => {
             return res.status(404).json({ isSuccess: false, message: 'Post not found' });
         }
 
-        await Post.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true });
-        res.status(200).json({ isSuccess: true, message: 'Post updated successfully', post });
+        // Update the post and return the updated post
+        const updatedPost = await Post.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true });
+        res.status(200).json({ isSuccess: true, message: 'Post updated successfully', post: updatedPost });
     } catch (error) {
         console.error("Error updating post:", error);
         res.status(500).json({ isSuccess: false, message: 'Error updating post' });
@@ -45,7 +46,10 @@ export const deletePost = async (req, res) => {
 // Get a single post by ID
 export const getPost = async (req, res) => {
     try {
-        const post = await Post.findById(req.params.id);
+        const { id } = req.params;
+        console.log('Received ID:', id); // Log the ID for debugging
+
+        const post = await Post.findById(id);
         if (!post) {
             return res.status(404).json({ isSuccess: false, message: 'Post not found' });
         }
@@ -56,21 +60,20 @@ export const getPost = async (req, res) => {
     }
 }
 
-export const getAllPosts = async (request, response) => {
-    const { username, category } = request.query; 
+// Get all posts with optional filtering
+export const getAllPosts = async (req, res) => {
+    const { username, category } = req.query; 
     try {
         const query = {};
         if (username) query.username = username;
         if (category) {
-            // Use $in to match against an array of categories
             query.categories = { $in: [category] };
         }
 
         const posts = await Post.find(query);
-        response.status(200).json({ isSuccess: true, posts });
+        res.status(200).json({ isSuccess: true, posts });
     } catch (error) {
         console.error("Error fetching posts:", error);
-        response.status(500).json({ isSuccess: false, message: 'Error fetching posts' });
+        res.status(500).json({ isSuccess: false, message: 'Error fetching posts' });
     }
 };
-

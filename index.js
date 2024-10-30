@@ -36,17 +36,19 @@ app.post('/upload', upload.single('file'), async (req, res) => {
   }
 });
 
-// Fetch post by ID
 app.get('/api/post/:id', async (req, res) => {
-  const { id } = req.params; // Get the ID from the request parameters
-  console.log('Received ID:', id); // Log the ID to ensure it is received correctly
+  const { id } = req.params; 
+  console.log('Received ID:', id); 
+
   try {
-      const post = await Post.findById(id); // Find the post by ID
-      if (!post) return res.status(404).send('Post not found');
+      const post = await Post.findById(id);
+      if (!post) {
+          return res.status(404).json({ message: 'Post not found' });
+      }
       res.json({ isSuccess: true, data: post });
   } catch (error) {
-      console.error('Error fetching post:', error);
-      res.status(500).send('Server error');
+      console.error('Error fetching post:', error.message);
+      res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
