@@ -6,6 +6,7 @@ import morgan from 'morgan';
 import upload from './utils/upload.js';
 import Router from './routes/route.js';
 import Connection from './database/db.js';
+import Post from './models/Post.js'; // Import the Post model
 
 dotenv.config();
 const app = express();
@@ -35,16 +36,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
   }
 });
 
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  if (req.method === 'OPTIONS') {
-    return res.status(204).end(); // Respond with no content for OPTIONS request
-  }
-  next();
-});
-
+// Fetch post by ID
 app.get('/api/post/:id', async (req, res) => {
   const { id } = req.params; // Get the ID from the request parameters
   console.log('Received ID:', id); // Log the ID to ensure it is received correctly
@@ -57,7 +49,6 @@ app.get('/api/post/:id', async (req, res) => {
       res.status(500).send('Server error');
   }
 });
-
 
 app.use('/api', Router);
 
