@@ -6,7 +6,7 @@ import morgan from 'morgan';
 import upload from './utils/upload.js';
 import Router from './routes/route.js';
 import Connection from './database/db.js';
-import Post from './models/Post.js'; // Import the Post model
+import Post from './model/post.js'; // Import the Post model
 
 dotenv.config();
 const app = express();
