@@ -23,11 +23,9 @@ app.use(
 
 app.options('*', cors());
 
-// Body parsers for handling JSON and form data
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// File Upload Endpoint
 app.post('/upload', upload.single('file'), async (req, res) => {
   try {
     const newImage = { name: req.file.originalname, path: req.file.path };
@@ -48,15 +46,15 @@ app.use((req, res, next) => {
 });
 
 
-// API Routes
 app.use('/api', Router);
 
-// Welcome Route
 app.get('/', (req, res) => res.send('Welcome to the API!'));
 
-// Connect to Database
 Connection();
 
-// Start Server
+app.get('/api/posts', (req, res) => {
+  res.status(200).json({ message: 'Posts retrieved' });
+});
+
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => console.log(`Server running on PORT ${PORT}`));

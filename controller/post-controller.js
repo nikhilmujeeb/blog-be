@@ -61,7 +61,10 @@ export const getAllPosts = async (request, response) => {
     try {
         const query = {};
         if (username) query.username = username;
-        if (category) query.categories = category;
+        if (category) {
+            // Use $in to match against an array of categories
+            query.categories = { $in: [category] };
+        }
 
         const posts = await Post.find(query);
         response.status(200).json({ isSuccess: true, posts });
@@ -69,4 +72,5 @@ export const getAllPosts = async (request, response) => {
         console.error("Error fetching posts:", error);
         response.status(500).json({ isSuccess: false, message: 'Error fetching posts' });
     }
-}
+};
+
