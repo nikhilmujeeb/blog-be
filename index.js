@@ -3,12 +3,11 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import morgan from 'morgan';
-import multer from 'multer';
-import Router from './routes/route.js';
-import Connection from './database/db.js';
+import upload from './utils/upload.js';
+import Router from './routes/route.js'; 
+import Connection from './database/db.js'; 
 
 dotenv.config();
-
 const app = express();
 
 app.use(morgan('dev'));
@@ -19,12 +18,6 @@ app.use(cors({
 }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'uploads/'),
-  filename: (req, file, cb) => cb(null, file.originalname),
-});
-const upload = multer({ storage });
 
 app.post('/upload', upload.single('file'), async (req, res) => {
   try {

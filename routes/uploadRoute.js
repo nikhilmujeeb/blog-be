@@ -1,10 +1,9 @@
 import express from 'express';
-import upload from '../utils/upload.js';
+import upload from '../utils/upload.js'; 
 import Image from '../model/Image.js';
 
 const router = express.Router();
 
-// Route to upload an image
 router.post('/upload', upload.single('file'), async (req, res) => {
   try {
     const newImage = new Image({

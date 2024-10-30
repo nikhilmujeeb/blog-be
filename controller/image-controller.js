@@ -7,32 +7,31 @@ let gfs, gridfsBucket;
 const conn = mongoose.connection;
 conn.once('open', () => {
     gridfsBucket = new mongoose.mongo.GridFSBucket(conn.db, {
-        bucketName: 'fs'
+        bucketName: 'photos'
     });
     gfs = grid(conn.db, mongoose.mongo);
-    gfs.collection('fs');
+    gfs.collection('photos'); 
 });
 
-export const uploadImage = (request, response) => {
-    if (!request.file) 
-        return response.status(404).json({ msg: "File not found" });
+export const uploadImage = (req, res) => {
+    if (!req.file) 
+        return res.status(404).json({ msg: "File not found" });
     
-    const imageUrl = `${url}/file/${request.file.filename}`;
-
-    response.status(200).json(imageUrl);    
+    const imageUrl = `${url}/file/${req.file.filename}`;
+    res.status(200).json(imageUrl);    
 }
 
-export const getImage = async (request, response) => {
+export const getImage = async (req, res) => {
     try {
-        const file = await gfs.files.findOne({ filename: request.params.filename });
-        if (!file) return response.status(404).json({ msg: 'File not found' }); // Check if file exists
+        const file = await gfs.files.findOne({ filename: req.params.filename });
+        if (!file) return res.status(404).json({ msg: 'File not found' });
 
         const readStream = gridfsBucket.openDownloadStream(file._id);
         readStream.on('error', () => {
-            response.status(500).json({ msg: 'Error reading file' });
+            res.status(500).json({ msg: 'Error reading file' });
         });
-        readStream.pipe(response);
+        readStream.pipe(res);
     } catch (error) {
-        response.status(500).json({ msg: 'Error retrieving image', error });
+        res.status(500).json({ msg: 'Error retrieving image', error });
     }
 }
