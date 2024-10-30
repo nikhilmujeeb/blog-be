@@ -14,7 +14,7 @@ router.post('/token', createNewToken);
 router.post('/create', authenticateToken, createPost);
 router.put('/update/:id', authenticateToken, updatePost);
 router.delete('/delete/:id', authenticateToken, deletePost);
-router.get('/post/:id', getPost);
+router.get('/post/:id', getPost); // This should correctly receive the ID
 router.get('/posts', getAllPosts);
 
 router.post('/comment/new', authenticateToken, newComment);
