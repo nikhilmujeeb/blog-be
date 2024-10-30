@@ -12,14 +12,16 @@ const app = express();
 
 app.use(morgan('dev')); // Logging middleware
 
-// CORS Configuration
 app.use(
   cors({
-    origin: ['http://localhost:3000', 'https://blog-fe-dcjv.onrender.com'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true,
+    origin: ['http://localhost:3000', 'https://blog-fe-dcjv.onrender.com'], // Allowed origins
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allow all needed methods
+    allowedHeaders: ['Content-Type', 'Authorization'], // Include headers used in requests
+    credentials: true, // Allow credentials if needed
   })
 );
+
+app.options('*', cors());
 
 // Body parsers for handling JSON and form data
 app.use(bodyParser.json());
@@ -34,6 +36,17 @@ app.post('/upload', upload.single('file'), async (req, res) => {
     res.status(500).json({ isSuccess: false, message: error.message });
   }
 });
+
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  if (req.method === 'OPTIONS') {
+    return res.status(204).end(); // Respond with no content for OPTIONS request
+  }
+  next();
+});
+
 
 // API Routes
 app.use('/api', Router);
