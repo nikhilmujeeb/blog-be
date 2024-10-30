@@ -45,6 +45,19 @@ app.use((req, res, next) => {
   next();
 });
 
+app.get('/api/post/:id', async (req, res) => {
+  const { id } = req.params; // Get the ID from the request parameters
+  console.log('Received ID:', id); // Log the ID to ensure it is received correctly
+  try {
+      const post = await Post.findById(id); // Find the post by ID
+      if (!post) return res.status(404).send('Post not found');
+      res.json({ isSuccess: true, data: post });
+  } catch (error) {
+      console.error('Error fetching post:', error);
+      res.status(500).send('Server error');
+  }
+});
+
 
 app.use('/api', Router);
 
