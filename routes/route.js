@@ -3,7 +3,7 @@ import { createPost, updatePost, deletePost, getPost, getAllPosts } from '../con
 import { newComment, getComments, deleteComment } from '../controller/comment-controller.js';
 import { loginUser, signupUser, logoutUser } from '../controller/user-controller.js';
 import { authenticateToken, createNewToken } from '../controller/jwt-controller.js';
-import Post from './models/Post.js'; // Ensure this line correctly imports your Post model
+import Post from './model/post.js';
 
 const router = express.Router();
 
@@ -22,13 +22,12 @@ router.post('/comment/new', authenticateToken, newComment);
 router.get('/comments/:id', authenticateToken, getComments);
 router.delete('/comment/delete/:id', authenticateToken, deleteComment);
 
-// Example route to fetch a post by ID
 router.get('/post/:id', async (req, res) => {
     try {
-        const { id } = req.params; // Get the ID from the request parameters
-        console.log('Received ID:', id); // Log the received ID for debugging
+        const { id } = req.params;
+        console.log('Received ID:', id);
 
-        const post = await Post.findById(id); // Ensure Post is defined here
+        const post = await Post.findById(id);
         if (!post) {
             return res.status(404).json({ msg: 'Post not found' });
         }
