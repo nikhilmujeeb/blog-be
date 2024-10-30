@@ -56,18 +56,17 @@ export const getPost = async (req, res) => {
     }
 }
 
-// Get all posts or filter by username or category
-export const getAllPosts = async (req, res) => {
-    const { username, category } = req.query;
+export const getAllPosts = async (request, response) => {
+    const { username, category } = request.query; 
     try {
         const query = {};
         if (username) query.username = username;
         if (category) query.categories = category;
 
         const posts = await Post.find(query);
-        res.status(200).json({ isSuccess: true, posts });
+        response.status(200).json({ isSuccess: true, posts });
     } catch (error) {
         console.error("Error fetching posts:", error);
-        res.status(500).json({ isSuccess: false, message: 'Error fetching posts' });
+        response.status(500).json({ isSuccess: false, message: 'Error fetching posts' });
     }
 }
