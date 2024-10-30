@@ -3,7 +3,7 @@ import { createPost, updatePost, deletePost, getPost, getAllPosts } from '../con
 import { newComment, getComments, deleteComment } from '../controller/comment-controller.js';
 import { loginUser, signupUser, logoutUser } from '../controller/user-controller.js';
 import { authenticateToken, createNewToken } from '../controller/jwt-controller.js';
-import Post from './model/post.js';
+import Post from '../model/post.js';
 
 const router = express.Router();
 
