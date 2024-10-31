@@ -16,7 +16,7 @@ router.put('/update/:id', authenticateToken, updatePost);
 router.delete('/delete/:id', authenticateToken, deletePost);
 router.get('/post/:id', getPost);
 router.get('/posts', getAllPosts);
-router.get('/categories', getAllCategories);
+router.get('/api/categories', getAllCategories); 
 
 router.post('/comment/new', authenticateToken, newComment);
 router.get('/comments/:id', authenticateToken, getComments);

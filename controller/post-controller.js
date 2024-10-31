@@ -3,8 +3,6 @@ import mongoose from 'mongoose';
 import Post from '../model/post.js';
 import Category from '../model/category.js';
 
-const router = express.Router(); // Initialize router
-
 // Create a new post
 export const createPost = async (req, res) => {
     try {
@@ -25,12 +23,11 @@ export const updatePost = async (req, res) => {
             return res.status(400).json({ isSuccess: false, message: 'Invalid post ID' });
         }
 
-        const post = await Post.findById(id);
-        if (!post) {
+        const updatedPost = await Post.findByIdAndUpdate(id, req.body, { new: true });
+        if (!updatedPost) {
             return res.status(404).json({ isSuccess: false, message: 'Post not found' });
         }
 
-        const updatedPost = await Post.findByIdAndUpdate(id, { $set: req.body }, { new: true });
         res.status(200).json({ isSuccess: true, message: 'Post updated successfully', post: updatedPost });
     } catch (error) {
         console.error("Error updating post:", error);
@@ -103,17 +100,4 @@ export const getAllCategories = async (req, res) => {
         console.error("Error fetching categories:", error);
         res.status(500).json({ isSuccess: false, message: 'Error fetching categories' });
     }
-};
-
-// Define the router's category endpoint
-router.get('/api/categories', getAllCategories);
-
-// Export all functions
-export default {
-    createPost,
-    updatePost,
-    deletePost,
-    getPost,
-    getAllPosts,
-    getAllCategories
 };
