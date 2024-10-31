@@ -4,29 +4,26 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import morgan from 'morgan';
 import upload from './utils/upload.js';
-import Router from './routes/route.js';
+import Router from './routes/route.js'; // Ensure this import is correct
 import Connection from './database/db.js';
-import Post from './model/post.js';
-import postController from './controller/post-controller.js'; // Correctly import postController
 
 dotenv.config();
 const app = express();
 
-// Use middleware for logging
+// Middleware for logging
 app.use(morgan('dev'));
 
 // CORS configuration
 app.use(
   cors({
-    origin: ['http://localhost:3000', 'https://blog-fe-dcjv.onrender.com'], // Allowed origins
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allow all needed methods
-    allowedHeaders: ['Content-Type', 'Authorization'], // Include headers used in requests
-    credentials: true, // Allow credentials if needed
+    origin: ['http://localhost:3000', 'https://blog-fe-dcjv.onrender.com'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
   })
 );
 
 app.options('*', cors());
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -40,35 +37,14 @@ app.post('/upload', upload.single('file'), async (req, res) => {
   }
 });
 
-// Get single post by ID
-app.get('/api/post/:id', async (req, res) => {
-  const { id } = req.params; 
-  console.log('Received ID:', id); 
-
-  try {
-      const post = await Post.findById(id);
-      if (!post) {
-          return res.status(404).json({ message: 'Post not found' });
-      }
-      res.json({ isSuccess: true, data: post });
-  } catch (error) {
-      console.error('Error fetching post:', error.message);
-      res.status(500).json({ message: 'Server error', error: error.message });
-  }
-});
-
-app.use('/api', Router); 
+// Use the router for API endpoints
+app.use('/api', Router); // This adds /api to all routes in Router
 
 // Test route
 app.get('/', (req, res) => res.send('Welcome to the API!'));
 
 // Connect to the database
 Connection();
-
-// Dummy posts route for testing
-app.get('/api/posts', (req, res) => {
-  res.status(200).json({ message: 'Posts retrieved' });
-});
 
 // Start the server
 const PORT = process.env.PORT || 8000;
