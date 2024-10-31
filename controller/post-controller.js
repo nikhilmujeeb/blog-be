@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import Post from '../model/post.js';
+import Category from '../model/category.js';
 
 // Create a new post
 export const createPost = async (req, res) => {
@@ -96,3 +97,14 @@ export const getAllPosts = async (req, res) => {
         res.status(500).json({ isSuccess: false, message: 'Error fetching posts' });
     }
 };
+
+
+// Categories route
+router.get('/api/categories', async (req, res) => {
+    try {
+        const categories = await Category.find();
+        res.status(200).json(categories);
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+});
