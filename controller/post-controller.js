@@ -15,14 +15,13 @@ export const createPost = async (req, res) => {
         console.error("Error saving post:", error);
         res.status(500).json({ isSuccess: false, message: 'Error saving post' });
     }
-}
+};
 
 // Update an existing post
 export const updatePost = async (req, res) => {
     try {
-        const { id } = req.params; // Use 'id' from the route parameters
+        const { id } = req.params;
         if (!mongoose.isValidObjectId(id)) {
-            console.error("Invalid ObjectId:", id);
             return res.status(400).json({ isSuccess: false, message: 'Invalid post ID' });
         }
 
@@ -31,21 +30,19 @@ export const updatePost = async (req, res) => {
             return res.status(404).json({ isSuccess: false, message: 'Post not found' });
         }
 
-        // Update the post and return the updated post
         const updatedPost = await Post.findByIdAndUpdate(id, { $set: req.body }, { new: true });
         res.status(200).json({ isSuccess: true, message: 'Post updated successfully', post: updatedPost });
     } catch (error) {
         console.error("Error updating post:", error);
         res.status(500).json({ isSuccess: false, message: 'Error updating post' });
     }
-}
+};
 
 // Delete a post
 export const deletePost = async (req, res) => {
     try {
-        const { id } = req.params; // Use 'id' from the route parameters
+        const { id } = req.params;
         if (!mongoose.isValidObjectId(id)) {
-            console.error("Invalid ObjectId:", id);
             return res.status(400).json({ isSuccess: false, message: 'Invalid post ID' });
         }
 
@@ -63,12 +60,8 @@ export const deletePost = async (req, res) => {
 // Get a single post by ID
 export const getPost = async (req, res) => {
     try {
-        const { id } = req.params; // Use 'id' from the route parameters
-        console.log('Received ID:', id); // Log the ID for debugging
-
-        // Check if the received ID is a valid ObjectId
+        const { id } = req.params;
         if (!mongoose.isValidObjectId(id)) {
-            console.error("Invalid ObjectId:", id);
             return res.status(400).json({ isSuccess: false, message: 'Invalid post ID' });
         }
 
@@ -81,7 +74,7 @@ export const getPost = async (req, res) => {
         console.error("Error fetching post:", error);
         res.status(500).json({ isSuccess: false, message: 'Error fetching post' });
     }
-}
+};
 
 // Get all posts with optional filtering
 export const getAllPosts = async (req, res) => {
@@ -101,7 +94,6 @@ export const getAllPosts = async (req, res) => {
     }
 };
 
-
 // Categories route
 router.get('/api/categories', async (req, res) => {
     try {
@@ -112,4 +104,5 @@ router.get('/api/categories', async (req, res) => {
     }
 });
 
+// Export router
 export default router;
