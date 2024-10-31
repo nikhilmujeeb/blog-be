@@ -7,14 +7,15 @@ import upload from './utils/upload.js';
 import Router from './routes/route.js';
 import Connection from './database/db.js';
 import Post from './model/post.js';
+import postController from './controller/post-controller.js'; // Correctly import postController
 
 dotenv.config();
 const app = express();
 
-app.use(postController);
+// Use middleware for logging
+app.use(morgan('dev'));
 
-app.use(morgan('dev')); // Logging middleware
-
+// CORS configuration
 app.use(
   cors({
     origin: ['http://localhost:3000', 'https://blog-fe-dcjv.onrender.com'], // Allowed origins
@@ -29,6 +30,7 @@ app.options('*', cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Upload route
 app.post('/upload', upload.single('file'), async (req, res) => {
   try {
     const newImage = { name: req.file.originalname, path: req.file.path };
@@ -38,6 +40,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
   }
 });
 
+// Get single post by ID
 app.get('/api/post/:id', async (req, res) => {
   const { id } = req.params; 
   console.log('Received ID:', id); 
@@ -54,15 +57,20 @@ app.get('/api/post/:id', async (req, res) => {
   }
 });
 
-app.use('/api', Router);
+// Use postController for API routes
+app.use('/api', postController); // Make sure the correct routes are defined in post-controller.js
 
+// Test route
 app.get('/', (req, res) => res.send('Welcome to the API!'));
 
+// Connect to the database
 Connection();
 
+// Dummy posts route for testing
 app.get('/api/posts', (req, res) => {
   res.status(200).json({ message: 'Posts retrieved' });
 });
 
+// Start the server
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => console.log(`Server running on PORT ${PORT}`));
