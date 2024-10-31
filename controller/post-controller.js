@@ -94,15 +94,26 @@ export const getAllPosts = async (req, res) => {
     }
 };
 
-// Categories route
-router.get('/api/categories', async (req, res) => {
+// Get all categories
+export const getAllCategories = async (req, res) => {
     try {
         const categories = await Category.find();
-        res.status(200).json(categories);
+        res.status(200).json({ isSuccess: true, categories });
     } catch (error) {
-        res.status(500).json({ message: "Server error", error: error.message });
+        console.error("Error fetching categories:", error);
+        res.status(500).json({ isSuccess: false, message: 'Error fetching categories' });
     }
-});
+};
 
-// Export router
-export default router;
+// Define the router's category endpoint
+router.get('/api/categories', getAllCategories);
+
+// Export all functions
+export default {
+    createPost,
+    updatePost,
+    deletePost,
+    getPost,
+    getAllPosts,
+    getAllCategories
+};

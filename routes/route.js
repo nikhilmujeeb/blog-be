@@ -3,6 +3,7 @@ import { createPost, updatePost, deletePost, getPost, getAllPosts } from '../con
 import { newComment, getComments, deleteComment } from '../controller/comment-controller.js';
 import { loginUser, signupUser, logoutUser } from '../controller/user-controller.js';
 import { authenticateToken, createNewToken } from '../controller/jwt-controller.js';
+import { getAllCategories } from '../controller/category-controller.js'; // Import the new function
 
 const router = express.Router();
 
@@ -14,8 +15,9 @@ router.post('/token', createNewToken);
 router.post('/create', authenticateToken, createPost);
 router.put('/update/:id', authenticateToken, updatePost);
 router.delete('/delete/:id', authenticateToken, deletePost);
-router.get('/post/:id', getPost); // This should correctly receive the ID
+router.get('/post/:id', getPost);
 router.get('/posts', getAllPosts);
+router.get('/categories', getAllCategories); // Correctly set the route for categories
 
 router.post('/comment/new', authenticateToken, newComment);
 router.get('/comments/:id', authenticateToken, getComments);

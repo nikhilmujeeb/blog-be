@@ -57,8 +57,7 @@ app.get('/api/post/:id', async (req, res) => {
   }
 });
 
-// Use postController for API routes
-app.use('/api', Router); // Make sure to use the router with the correct path
+app.use('/api', Router); 
 
 // Test route
 app.get('/', (req, res) => res.send('Welcome to the API!'));
