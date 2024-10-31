@@ -1,3 +1,4 @@
+import express from 'express';
 import mongoose from 'mongoose';
 import Post from '../model/post.js';
 import Category from '../model/category.js';
@@ -108,3 +109,5 @@ router.get('/api/categories', async (req, res) => {
         res.status(500).json({ message: "Server error", error: error.message });
     }
 });
+
+export default router;
