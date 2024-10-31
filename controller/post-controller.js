@@ -3,6 +3,8 @@ import mongoose from 'mongoose';
 import Post from '../model/post.js';
 import Category from '../model/category.js';
 
+const router = express.Router(); // Initialize router
+
 // Create a new post
 export const createPost = async (req, res) => {
     try {

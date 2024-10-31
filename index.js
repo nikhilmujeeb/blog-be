@@ -11,6 +11,8 @@ import Post from './model/post.js';
 dotenv.config();
 const app = express();
 
+app.use(postController);
+
 app.use(morgan('dev')); // Logging middleware
 
 app.use(
