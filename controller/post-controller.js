@@ -11,7 +11,7 @@ export const createPost = async (request, response) => {
         console.error('Error creating post:', error.message);
         response.status(500).json({ msg: 'Internal Server Error', error });
     }
-}
+};
 
 export const updatePost = async (request, response) => {
     const { id } = request.params;
@@ -30,7 +30,7 @@ export const updatePost = async (request, response) => {
         console.error('Error updating post:', error.message);
         response.status(500).json({ msg: 'Internal Server Error', error });
     }
-}
+};
 
 export const deletePost = async (request, response) => {
     const { id } = request.params;
@@ -49,7 +49,7 @@ export const deletePost = async (request, response) => {
         console.error('Error deleting post:', error.message);
         response.status(500).json({ msg: 'Internal Server Error', error });
     }
-}
+};
 
 export const getPost = async (request, response) => {
     const { id } = request.params;
