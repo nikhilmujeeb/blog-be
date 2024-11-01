@@ -10,10 +10,8 @@ import Connection from './database/db.js';
 dotenv.config();
 const app = express();
 
-// Middleware for logging
 app.use(morgan('dev'));
 
-// CORS configuration
 app.use(
   cors({
     origin: ['http://localhost:3000', 'https://blog-fe-dcjv.onrender.com'],
@@ -26,7 +24,6 @@ app.use(
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Upload route
 app.post('/upload', upload.single('file'), async (req, res) => {
   try {
     const newImage = { name: req.file.originalname, path: req.file.path };
@@ -40,7 +37,15 @@ app.use('/api', Router);
 
 app.get('/', (req, res) => res.send('Welcome to the API!'));
 
-Connection();
+const PORT = 8000;
 
-const PORT = process.env.PORT || 8000;
-app.listen(PORT, () => console.log(`Server running on PORT ${PORT}`));
+const startServer = async () => {
+  try {
+    await Connection();
+    app.listen(PORT, () => console.log(`Server running on PORT ${PORT}`));
+  } catch (error) {
+    console.error('Failed to start the server:', error.message);
+  }
+};
+
+startServer();
