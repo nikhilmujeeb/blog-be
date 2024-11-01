@@ -4,14 +4,13 @@ import { uploadImage, getImage } from '../controller/image-controller.js';
 import { newComment, getComments, deleteComment } from '../controller/comment-controller.js';
 import { loginUser, singupUser, logoutUser } from '../controller/user-controller.js';
 import { authenticateToken, createNewToken } from '../controller/jwt-controller.js';
-import upload from '../utils/upload.js';
+import upload from '../utils/upload.js'; // multer setup for handling file uploads
 
 const router = express.Router();
 
 router.post('/login', loginUser);
 router.post('/signup', singupUser);
 router.post('/logout', logoutUser);
-
 router.post('/token', createNewToken);
 
 router.post('/create', authenticateToken, createPost);
