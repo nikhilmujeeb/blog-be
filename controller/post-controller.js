@@ -69,4 +69,5 @@ export const getAllCategories = async (req, res) => {
     }
 };
 
+// Export all functions at once, without repeating `getAllCategories`
 export { createPost, updatePost, deletePost, getPost, getAllPosts, getAllCategories };
