@@ -48,7 +48,7 @@ export const deletePost = async (request, response) => {
         if (!post) return response.status(404).json({ msg: 'Post not found' });
 
         await post.deleteOne();
-        response.status(200).json('Post deleted successfully');
+        response.status(200).json({ msg: 'Post deleted successfully' });
     } catch (error) {
         console.error('Error deleting post:', error.message);
         response.status(500).json({ msg: 'Internal Server Error', error });
