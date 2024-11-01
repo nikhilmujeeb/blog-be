@@ -36,15 +36,11 @@ app.post('/upload', upload.single('file'), async (req, res) => {
   }
 });
 
-// Use the router for API endpoints
 app.use('/api', Router);
 
-// Test route
 app.get('/', (req, res) => res.send('Welcome to the API!'));
 
-// Connect to the database
 Connection();
 
-// Start the server
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => console.log(`Server running on PORT ${PORT}`));

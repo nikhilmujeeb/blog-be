@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import Token from '../model/token.js'
@@ -8,8 +8,7 @@ dotenv.config();
 
 export const singupUser = async (request, response) => {
     try {
-        // const salt = await bcrypt.genSalt();
-        // const hashedPassword = await bcrypt.hash(request.body.password, salt);
+
         const hashedPassword = await bcrypt.hash(request.body.password, 10);
 
         const user = { username: request.body.username, name: request.body.name, password: hashedPassword }

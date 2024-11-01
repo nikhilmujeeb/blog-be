@@ -1,6 +1,4 @@
-
 import Comment from '../model/comment.js';
-
 
 export const newComment = async (request, response) => {
     try {
