@@ -1,5 +1,5 @@
 import Post from '../model/post.js';
-import Category from '../model/category.js'; // Assuming there is a Category model
+import Category from '../model/category.js';
 
 export const createPost = async (request, response) => {
     try {
