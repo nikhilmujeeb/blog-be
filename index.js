@@ -3,9 +3,9 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import morgan from 'morgan';
-import upload from './utils/upload.js';
-import Router from './routes/route.js';
+import Router from './routes/route.js'; // Keep the upload import only in the route file
 import Connection from './database/db.js';
+import upload from './utils/upload.js'; // If this is a separate upload configuration, keep it here
 
 dotenv.config();
 const app = express();
@@ -24,6 +24,7 @@ app.use(
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Remove this if you don't need a separate upload endpoint in your main app
 app.post('/upload', upload.single('file'), async (req, res) => {
   try {
     const newImage = { name: req.file.originalname, path: req.file.path };
