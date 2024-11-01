@@ -7,6 +7,7 @@ import { authenticateToken, createNewToken } from '../controller/jwt-controller.
 import upload from '../utils/upload.js'; // multer setup for handling file uploads
 
 const router = express.Router();
+const upload = multer({ storage: multer.memoryStorage() });
 
 router.post('/login', loginUser);
 router.post('/signup', singupUser);
