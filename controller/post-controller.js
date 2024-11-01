@@ -24,7 +24,12 @@ export const updatePost = async (request, response) => {
         const post = await Post.findById(id);
         if (!post) return response.status(404).json({ msg: 'Post not found' });
 
-        await Post.findByIdAndUpdate(id, { $set: request.body });
+        const updatedPost = {
+            ...post.toObject(), 
+            ...request.body, 
+        };
+
+        await Post.findByIdAndUpdate(id, { $set: updatedPost });
         response.status(200).json('Post updated successfully');
     } catch (error) {
         console.error('Error updating post:', error.message);
