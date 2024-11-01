@@ -68,6 +68,3 @@ export const getAllCategories = async (req, res) => {
         res.status(500).json({ isSuccess: false, message: 'Error fetching categories' });
     }
 };
-
-// Export all functions at once, without repeating `getAllCategories`
-export { createPost, updatePost, deletePost, getPost, getAllPosts, getAllCategories };
