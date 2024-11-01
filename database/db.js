@@ -3,6 +3,8 @@ import mongoose from 'mongoose';
 const Connection = async () => {
   const URL = process.env.DB;
 
+  mongoose.set('strictQuery', false);
+
   try {
     await mongoose.connect(URL, { 
       useNewUrlParser: true, 
