@@ -20,6 +20,7 @@ export const updatePost = async (req, res) => {
     try {
         const { id } = req.params;
         if (!mongoose.isValidObjectId(id)) {
+            console.warn("Invalid post ID:", id); // Logging the invalid ID
             return res.status(400).json({ isSuccess: false, message: 'Invalid post ID' });
         }
 
@@ -40,6 +41,7 @@ export const deletePost = async (req, res) => {
     try {
         const { id } = req.params;
         if (!mongoose.isValidObjectId(id)) {
+            console.warn("Invalid post ID:", id);
             return res.status(400).json({ isSuccess: false, message: 'Invalid post ID' });
         }
 
@@ -59,6 +61,7 @@ export const getPost = async (req, res) => {
     try {
         const { id } = req.params;
         if (!mongoose.isValidObjectId(id)) {
+            console.warn("Invalid post ID:", id);
             return res.status(400).json({ isSuccess: false, message: 'Invalid post ID' });
         }
 
