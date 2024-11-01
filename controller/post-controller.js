@@ -53,6 +53,7 @@ export const deletePost = async (request, response) => {
 
 export const getPost = async (request, response) => {
     const { id } = request.params;
+    console.log('Received ID for post retrieval:', id);
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return response.status(400).json({ msg: 'Invalid ObjectId' });
@@ -86,4 +87,4 @@ export const getAllPosts = async (request, response) => {
         console.error('Error retrieving posts:', error.message);
         response.status(500).json({ msg: 'Internal Server Error', error });
     }
-}
+};
