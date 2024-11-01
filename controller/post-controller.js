@@ -1,106 +1,68 @@
-import express from 'express';
-import mongoose from 'mongoose';
 import Post from '../model/post.js';
-import Category from '../model/category.js';
 
-// Create a new post
-export const createPost = async (req, res) => {
+export const createPost = async (request, response) => {
     try {
-        const post = new Post(req.body);
-        await post.save();
-        res.status(201).json({ isSuccess: true, message: 'Post saved successfully', post });
+        const post = await new Post(request.body);
+        post.save();
+
+        response.status(200).json('Post saved successfully');
     } catch (error) {
-        console.error("Error saving post:", error);
-        res.status(500).json({ isSuccess: false, message: 'Error saving post' });
+        response.status(500).json(error);
     }
-};
+}
 
-// Update an existing post
-export const updatePost = async (req, res) => {
+export const updatePost = async (request, response) => {
     try {
-        const { id } = req.params;
-        if (!mongoose.isValidObjectId(id)) {
-            console.warn("Invalid post ID:", id); // Logging the invalid ID
-            return res.status(400).json({ isSuccess: false, message: 'Invalid post ID' });
-        }
+        const post = await Post.findById(request.params.id);
 
-        const updatedPost = await Post.findByIdAndUpdate(id, req.body, { new: true });
-        if (!updatedPost) {
-            return res.status(404).json({ isSuccess: false, message: 'Post not found' });
-        }
-
-        res.status(200).json({ isSuccess: true, message: 'Post updated successfully', post: updatedPost });
-    } catch (error) {
-        console.error("Error updating post:", error);
-        res.status(500).json({ isSuccess: false, message: 'Error updating post' });
-    }
-};
-
-// Delete a post
-export const deletePost = async (req, res) => {
-    try {
-        const { id } = req.params;
-        if (!mongoose.isValidObjectId(id)) {
-            console.warn("Invalid post ID:", id);
-            return res.status(400).json({ isSuccess: false, message: 'Invalid post ID' });
-        }
-
-        const result = await Post.findByIdAndDelete(id);
-        if (!result) {
-            return res.status(404).json({ isSuccess: false, message: "Post not found" });
-        }
-        res.status(200).json({ isSuccess: true, message: "Post deleted successfully" });
-    } catch (error) {
-        console.error("Error deleting post:", error);
-        res.status(500).json({ isSuccess: false, message: "Failed to delete post" });
-    }
-};
-
-// Get a single post by ID
-export const getPost = async (req, res) => {
-    try {
-        const { id } = req.params;
-        if (!mongoose.isValidObjectId(id)) {
-            console.warn("Invalid post ID:", id);
-            return res.status(400).json({ isSuccess: false, message: 'Invalid post ID' });
-        }
-
-        const post = await Post.findById(id);
         if (!post) {
-            return res.status(404).json({ isSuccess: false, message: 'Post not found' });
+            response.status(404).json({ msg: 'Post not found' })
         }
-        res.status(200).json({ isSuccess: true, post });
-    } catch (error) {
-        console.error("Error fetching post:", error);
-        res.status(500).json({ isSuccess: false, message: 'Error fetching post' });
-    }
-};
+        
+        await Post.findByIdAndUpdate( request.params.id, { $set: request.body })
 
-// Get all posts with optional filtering
-export const getAllPosts = async (req, res) => {
-    const { username, category } = req.query; 
+        response.status(200).json('post updated successfully');
+    } catch (error) {
+        response.status(500).json(error);
+    }
+}
+
+export const deletePost = async (request, response) => {
     try {
-        const query = {};
-        if (username) query.username = username;
-        if (category) {
-            query.categories = { $in: [category] };
-        }
+        const post = await Post.findById(request.params.id);
+        
+        await post.delete()
 
-        const posts = await Post.find(query);
-        res.status(200).json({ isSuccess: true, posts });
+        response.status(200).json('post deleted successfully');
     } catch (error) {
-        console.error("Error fetching posts:", error);
-        res.status(500).json({ isSuccess: false, message: 'Error fetching posts' });
+        response.status(500).json(error)
     }
-};
+}
 
-// Get all categories
-export const getAllCategories = async (req, res) => {
+export const getPost = async (request, response) => {
     try {
-        const categories = await Category.find();
-        res.status(200).json({ isSuccess: true, categories });
+        const post = await Post.findById(request.params.id);
+
+        response.status(200).json(post);
     } catch (error) {
-        console.error("Error fetching categories:", error);
-        res.status(500).json({ isSuccess: false, message: 'Error fetching categories' });
+        response.status(500).json(error)
     }
-};
+}
+
+export const getAllPosts = async (request, response) => {
+    let username = request.query.username;
+    let category = request.query.category;
+    let posts;
+    try {
+        if(username) 
+            posts = await Post.find({ username: username });
+        else if (category) 
+            posts = await Post.find({ categories: category });
+        else 
+            posts = await Post.find({});
+            
+        response.status(200).json(posts);
+    } catch (error) {
+        response.status(500).json(error)
+    }
+}
