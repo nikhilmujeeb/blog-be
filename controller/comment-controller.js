@@ -1,4 +1,6 @@
+
 import Comment from '../model/comment.js';
+
 
 export const newComment = async (request, response) => {
     try {
@@ -10,6 +12,7 @@ export const newComment = async (request, response) => {
         response.status(500).json(error);
     }
 }
+
 
 export const getComments = async (request, response) => {
     try {
