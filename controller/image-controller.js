@@ -1,22 +1,25 @@
 import multer from 'multer';
-import mongoose from 'mongoose';
-import cloudinary from '../utils/cloudinaryConfig.js'; // Cloudinary configuration
-import ImageKit from 'imagekit'; // Make sure to install this if not already
 import grid from 'gridfs-stream';
+import mongoose from 'mongoose';
+import cloudinary from '../utils/cloudinaryConfig.js'; // import the Cloudinary config
 
 const url = 'https://blog-be-3tvt.onrender.com';
+
 let gfs, gridfsBucket;
 const conn = mongoose.connection;
 
 // Set up GridFS bucket
 conn.once('open', () => {
-    gridfsBucket = new mongoose.mongo.GridFSBucket(conn.db, { bucketName: 'fs' });
+    gridfsBucket = new mongoose.mongo.GridFSBucket(conn.db, {
+        bucketName: 'fs'
+    });
     gfs = grid(conn.db, mongoose.mongo);
 });
 
-// Configure multer for in-memory storage
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
+
+import cloudinary from '../utils/cloudinaryConfig.js';
 
 const imageKit = new ImageKit({
     publicKey: process.env.IMAGEKIT_PUBLIC_KEY,
@@ -24,7 +27,6 @@ const imageKit = new ImageKit({
     urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT 
 });
 
-// Upload image to ImageKit and optionally to Cloudinary or GridFS
 export const uploadImage = (request, response) => {
     upload.single('file')(request, response, (err) => {
         if (err) {
@@ -40,9 +42,9 @@ export const uploadImage = (request, response) => {
 
         // Upload to ImageKit
         imageKit.upload({
-            file: fileBuffer,
-            fileName: fileName,
-            folder: "your_folder_name", // Optional
+            file: fileBuffer, // The file to be uploaded
+            fileName: fileName, // File name
+            folder: "your_folder_name", // Optional: specify a folder in ImageKit
         }, (error, result) => {
             if (error) {
                 return response.status(500).json({ msg: error.message });

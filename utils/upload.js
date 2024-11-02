@@ -1,14 +1,20 @@
-// utils/upload.js
 import multer from 'multer';
-import { CloudinaryStorage } from 'multer-storage-cloudinary';
-import cloudinary from './cloudinaryConfig.js'; // import the Cloudinary configuration
-import { CloudinaryStorage } from 'multer-storage-cloudinary';
+import { GridFsStorage } from 'multer-gridfs-storage';
 
-const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'your_folder_name', // Optional: specify a folder in your Cloudinary account
-    allowed_formats: ['jpg', 'jpeg', 'png'],
+const storage = new GridFsStorage({
+  url: process.env.DB, 
+  options: { useNewUrlParser: true, useUnifiedTopology: true },
+  file: (req, file) => {
+    const match = ["image/png", "image/jpg", "image/jpeg"];
+
+    if (match.indexOf(file.mimetype) === -1) {
+      return `${Date.now()}-blog-${file.originalname}`;
+    }
+
+    return {
+      bucketName: 'photos',
+      filename: `${Date.now()}-blog-${file.originalname}`,
+    };
   },
 });
 
