@@ -1,7 +1,6 @@
 import multer from 'multer';
 import grid from 'gridfs-stream';
 import mongoose from 'mongoose';
-import cloudinary from '../utils/cloudinaryConfig.js'; // import the Cloudinary config
 
 const url = 'https://blog-be-3tvt.onrender.com';
 
