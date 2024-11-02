@@ -1,6 +1,7 @@
 import multer from 'multer';
 import grid from 'gridfs-stream';
 import mongoose from 'mongoose';
+import cloudinary from '../utils/cloudinaryConfig.js'; // import the Cloudinary config
 
 const url = 'https://blog-be-3tvt.onrender.com';
 
@@ -15,30 +16,44 @@ conn.once('open', () => {
     gfs = grid(conn.db, mongoose.mongo);
 });
 
-// Configure multer for file uploads
-const storage = multer.memoryStorage(); // Store file in memory
+const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-// Upload image function
+import cloudinary from '../utils/cloudinaryConfig.js';
+
+const imageKit = new ImageKit({
+    publicKey: process.env.IMAGEKIT_PUBLIC_KEY,
+    privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
+    urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT 
+});
+
 export const uploadImage = (request, response) => {
     upload.single('file')(request, response, (err) => {
         if (err) {
             return response.status(500).json({ msg: err.message });
         }
 
-        if (!request.file) 
+        if (!request.file) {
             return response.status(404).json("File not found");
+        }
 
-        const writeStream = gridfsBucket.openUploadStream(request.file.originalname);
-        writeStream.end(request.file.buffer);
+        const fileBuffer = request.file.buffer;
+        const fileName = `${Date.now()}-${request.file.originalname}`;
 
-        writeStream.on('finish', () => {
-            const imageUrl = `${url}/file/${writeStream.id}`; // Updated to use unique stream ID
-            response.status(200).json({ isSuccess: true, url: imageUrl });
-        });
+        // Upload to ImageKit
+        imageKit.upload({
+            file: fileBuffer, // The file to be uploaded
+            fileName: fileName, // File name
+            folder: "your_folder_name", // Optional: specify a folder in ImageKit
+        }, (error, result) => {
+            if (error) {
+                return response.status(500).json({ msg: error.message });
+            }
 
-        writeStream.on('error', (error) => {
-            response.status(500).json({ msg: error.message });
+            response.status(200).json({ 
+                isSuccess: true, 
+                url: result.url // URL of the uploaded image
+            });
         });
     });
 };
